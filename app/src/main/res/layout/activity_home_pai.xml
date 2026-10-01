@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="@color/white">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="24dp"
+        android:paddingTop="56dp"
+        android:paddingBottom="40dp">
+
+        <TextView
+            android:id="@+id/txtSub"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Painel do responsável"
+            android:textColor="@color/slate_500"
+            android:textSize="12sp"
+            android:letterSpacing="0.08"
+            android:fontFamily="sans-serif-medium"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/txtTitulo"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Monitoramento"
+            android:textColor="@color/slate_900"
+            android:textSize="28sp"
+            android:letterSpacing="-0.02"
+            android:fontFamily="sans-serif-medium"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/txtSub" />
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardIA"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="@color/slate_50"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/txtTitulo">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Pesquisa Inteligente (Gemini)"
+                    android:textColor="@color/slate_900"
+                    android:textSize="16sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:drawableStart="@android:drawable/ic_menu_search"
+                    android:drawablePadding="8dp" />
+
+                <EditText
+                    android:id="@+id/edtPesquisaIA"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:hint="Ex: Como foi o uso de tela do meu filho hoje?"
+                    android:background="@drawable/bg_edittext_ia"
+                    android:padding="12dp"
+                    android:textSize="14sp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnPerguntarIA"
+                    style="@style/Widget.EagleEyes.Button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="Analisar com Gemini"
+                    app:backgroundTint="#8B5CF6" />
+
+                <TextView
+                    android:id="@+id/txtRespostaIA"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:visibility="gone"
+                    android:textColor="@color/slate_700"
+                    android:textSize="14sp"
+                    android:lineSpacingExtra="4sp" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <View
+            android:id="@+id/divider"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_marginTop="24dp"
+            android:background="@color/slate_100"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/cardIA" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnMeusFilhos"
+            style="@style/Widget.EagleEyes.Button"
+            android:layout_width="0dp"
+            android:layout_height="64dp"
+            android:layout_marginTop="24dp"
+            android:backgroundTint="@color/slate_50"
+            android:text="Gerenciar Filhos"
+            android:textColor="@color/slate_900"
+            android:textSize="16sp"
+            android:gravity="start|center_vertical"
+            android:paddingStart="20dp"
+            app:icon="@android:drawable/ic_menu_myplaces"
+            app:iconTint="@color/brand_blue"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/divider"
+            app:strokeColor="@color/slate_200"
+            app:strokeWidth="1dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnVerAlertas"
+            style="@style/Widget.EagleEyes.Button"
+            android:layout_width="0dp"
+            android:layout_height="64dp"
+            android:layout_marginTop="12dp"
+            android:backgroundTint="@color/slate_50"
+            android:text="Ver Alertas de Segurança"
+            android:textColor="@color/slate_900"
+            android:textSize="16sp"
+            android:gravity="start|center_vertical"
+            android:paddingStart="20dp"
+            app:icon="@android:drawable/ic_dialog_alert"
+            app:iconTint="#F59E0B"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/btnMeusFilhos"
+            app:strokeColor="@color/slate_200"
+            app:strokeWidth="1dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnInstrucoesVinculo"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="0dp"
+            android:layout_height="52dp"
+            android:layout_marginTop="32dp"
+            android:text="Instruções de vínculo"
+            android:textAllCaps="false"
+            android:textColor="@color/brand_blue"
+            android:textSize="14sp"
+            app:cornerRadius="10dp"
+            app:strokeColor="@color/slate_300"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/btnVerAlertas" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnLogout"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Sair da conta"
+            android:textAllCaps="false"
+            android:textColor="#EF4444"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/btnInstrucoesVinculo" />
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

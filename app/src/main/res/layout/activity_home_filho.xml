@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="@color/white">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="24dp"
+        android:paddingTop="40dp"
+        android:paddingBottom="40dp">
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardHeader"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="@color/slate_50"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="24dp"
+                android:gravity="center">
+
+                <ImageView
+                    android:layout_width="72dp"
+                    android:layout_height="72dp"
+                    android:src="@android:drawable/ic_menu_myplaces"
+                    app:tint="@color/brand_blue" />
+
+                <TextView
+                    android:id="@+id/txtNomeDetalhes"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="Nome do Filho"
+                    android:textColor="@color/slate_900"
+                    android:textSize="22sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:gravity="center" />
+
+                <TextView
+                    android:id="@+id/txtEmailDetalhes"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="email@filho.com"
+                    android:textColor="@color/slate_500"
+                    android:textSize="14sp"
+                    android:gravity="center" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <TextView
+            android:id="@+id/lblAcoes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:text="Minhas Atividades"
+            android:textColor="@color/slate_900"
+            android:textSize="16sp"
+            android:fontFamily="sans-serif-medium"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/cardHeader" />
+
+        <LinearLayout
+            android:id="@+id/layoutAcoes"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/lblAcoes">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnVerHistorico"
+                style="@style/Widget.EagleEyes.Button"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginBottom="12dp"
+                android:backgroundTint="@color/slate_50"
+                android:text="Ver Meu Histórico"
+                android:textColor="@color/slate_900"
+                app:strokeColor="@color/slate_200"
+                app:strokeWidth="1dp"
+                app:icon="@android:drawable/ic_menu_recent_history"
+                app:iconTint="@color/brand_blue" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnVerAlertasFilho"
+                style="@style/Widget.EagleEyes.Button"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginBottom="12dp"
+                android:backgroundTint="@color/brand_blue"
+                android:text="Meus Alertas"
+                android:textColor="@color/white"
+                app:icon="@android:drawable/ic_dialog_alert"
+                app:iconTint="@color/white" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnAnaliseIA"
+                style="@style/Widget.EagleEyes.Button"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginBottom="12dp"
+                android:backgroundTint="#E6F4EA"
+                android:text="Análise de Uso com IA"
+                android:textColor="#137333"
+                app:icon="@android:drawable/ic_menu_help"
+                app:iconTint="#137333" />
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardRespostaIA"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="@color/slate_50"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/txtRespostaIA"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp"
+                    android:textColor="@color/slate_700"
+                    android:textSize="14sp"
+                    tools:text="Resultado da análise IA..." />
+            </androidx.cardview.widget.CardView>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnAtivarAdmin"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginBottom="12dp"
+                android:text="Concluir Configuração"
+                android:textAllCaps="false"
+                android:textColor="#4F46E5"
+                app:cornerRadius="16dp"
+                app:strokeColor="#E0E7FF"
+                app:icon="@android:drawable/ic_lock_lock"
+                app:iconTint="#4F46E5" />
+
+        </LinearLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnLogout"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Sair da conta"
+            android:textAllCaps="false"
+            android:textColor="#EF4444"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/layoutAcoes" />
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

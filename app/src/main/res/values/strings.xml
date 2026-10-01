@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">EagleEyes</string>
+    <string name="accessibility_service_description">Este serviço é necessário para que o EagleEyes possa monitorar o uso de aplicativos e aplicar bloqueios definidos pelos pais para garantir a segurança digital.</string>
+    <string name="device_admin_description">Ative esta permissão para impedir que o aplicativo seja desinstalado sem autorização, garantindo a continuidade do monitoramento parental.</string>
+</resources>

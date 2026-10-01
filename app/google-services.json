@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "775801357501",
+    "project_id": "tcc-univap-2026",
+    "storage_bucket": "tcc-univap-2026.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:775801357501:android:cd8b19c869fb687e3ce3d4",
+        "android_client_info": {
+          "package_name": "com.fabio.eagleeyes"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAj_4lE5y5yqJWjZOWRZu6Qzkm9vbW0iA8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
