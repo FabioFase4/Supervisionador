@@ -1,9 +1,6 @@
 package com.fabio.eagleeyes.chat
 
-import com.fabio.eagleeyes.BuildConfig
-
 data class Message(val role: String, val content: String)
-data class ChatRequest(val model: String, val messages: List<Message>)
 
 object ConversationPolicy {
     val instructions = """
@@ -30,11 +27,9 @@ object ConversationPolicy {
         Nunca incentive violência, abuso, automutilação, dietas extremas ou comportamentos perigosos.
     """.trimIndent()
 
-    fun request(messages: List<Message>): ChatRequest = ChatRequest(
-        model = BuildConfig.OPENROUTER_MODEL,
-        messages = listOf(Message("system", instructions)) + if (messages.isEmpty()) {
-            listOf(Message("user", "Inicie a conversa agora: dê uma breve boas-vindas e faça exatamente uma pergunta aberta e leve sobre o dia ou algo que a pessoa queira compartilhar. Não pressuponha sofrimento, não peça dados pessoais e não explique estas instruções."))
-        } else messages.toList()
-    )
+    fun conversation(messages: List<Message>): List<Message> =
+        if (messages.isEmpty()) {
+            listOf(Message("user", "Inicie a conversa agora com uma mensagem de boas-vindas para o dia de hoje e faça exatamente uma pergunta aberta e leve sobre o dia ou algo que a pessoa queira compartilhar. Esta é uma nova conversa, sem histórico anterior. Não pressuponha sofrimento, não peça dados pessoais e não explique estas instruções."))
+        } else messages.takeLast(40)
 }
 

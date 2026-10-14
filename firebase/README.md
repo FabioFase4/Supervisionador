@@ -8,7 +8,9 @@ O app usa o projeto do `app/google-services.json`. Não é necessário instalar 
 - `usuarios/filhos/{uid}/idResponsavel`: UID do responsável; pode estar ausente antes do vínculo.
 - `chatbox/{uidDoFilho}/mensagens/{id}`: `id`, `role` (`user` ou `assistant`), `content` e `createdAt` (horário do servidor em milissegundos).
 
-A tela recupera as últimas 100 mensagens; todas permanecem no banco. A API recebe até 40 mensagens recentes, além das instruções de sistema. A conversa é contínua por conta. A gravação da mensagem do jovem é confirmada antes da chamada à IA, e a resposta só é exibida depois de confirmada no Firebase. Se a conexão cair, o botão Tentar novamente reutiliza as mesmas chaves. Se o processo encerrar com uma pergunta já salva, ela é retomada ao abrir a tela.
+A tela inicia uma conversa nova a cada abertura e pede ao Gemini uma mensagem para o dia, sem consultar o perfil ou o histórico no Firebase. Não há agendamento nem limite de uma geração por dia. A abertura é exibida sem depender do banco; ao enviar a primeira mensagem, o app arquiva também essa abertura com uma chave única por conversa. O histórico antigo permanece no banco, mas não é recuperado na tela nem enviado à IA. A API recebe até 40 mensagens da sessão atual, além das instruções do Chatbox.
+
+A gravação da mensagem do jovem é confirmada antes da chamada à IA, e as respostas seguintes só são exibidas depois de confirmadas no Firebase. Se a conexão cair, o botão Tentar novamente reutiliza as mesmas chaves durante a sessão. Reabrir a tela ou reiniciar o processo começa outra conversa; não retoma perguntas antigas. As transações de gravação ainda precisam de permissão de leitura e escrita na mensagem correspondente, mas não consultam a lista do histórico.
 
 ## Regras
 
@@ -24,7 +26,9 @@ Referência: [regras do Realtime Database](https://firebase.google.com/docs/data
 
 ## Configuração da IA
 
-`OPENROUTER_API_KEY` e `OPENROUTER_MODEL` são lidos, nesta ordem, do ambiente, do `local.properties` deste projeto e do `../chatbox/local.properties`. Nenhuma chave é copiada para o código-fonte. Para desenvolvimento, a chave continua embutida no APK, assim como no Chatbox original; uma distribuição pública deve usar um backend autenticado para manter a credencial no servidor.
+O Chatbox usa o mesmo backend Gemini das análises do app, definido em `GeminiConfig.getBackendUrl()`. Envia um POST com o campo `mensagem`, contendo as instruções do Chatbox e até 40 mensagens recentes. O modelo e a credencial são os configurados nesse backend; não é necessário configurar OpenRouter nem copiar chaves da pasta `chatbox`. As configurações de acesso direto ao Gemini usadas em outras partes do app permanecem inalteradas.
+
+Respostas de erro HTTP, erros JSON e conteúdo vazio ou HTML geram uma opção de nova tentativa, sem serem gravados como falas da IA. A persistência continua usando o Firebase Authentication e o Realtime Database do app.
 
 ## Verificação manual com contas de teste
 
@@ -32,8 +36,8 @@ Referência: [regras do Realtime Database](https://firebase.google.com/docs/data
 2. Na conta do responsável, abrir **Vincular contas pelo ID**, colar o ID do jovem e vincular. Conferir a atualização em **Meus filhos**, inclusive se a lista estiver aberta em outro dispositivo.
 3. Com outro jovem sem vínculo, fazer o caminho inverso: informar o ID do responsável na conta do jovem. Repetir o vínculo para conferir a operação idempotente.
 4. Testar próprio ID, ID inexistente, e-mail, espaços externos, conta de perfil errado e jovem já vinculado a outro responsável. Os erros devem aparecer sem alterar o vínculo existente.
-5. Abrir Chatbox, aguardar a abertura, enviar uma mensagem fictícia, sair da tela e reabri-la. Conferir mensagens e timestamps em `chatbox/{uid}/mensagens`.
-6. Testar interrupção da rede, erro da API, rotação e encerramento do processo após uma pergunta salva. A retomada não deve duplicar a pergunta.
+5. Abrir Chatbox e conferir que a mensagem do dia aparece mesmo sem acesso de leitura ao histórico. Com permissões de gravação configuradas, enviar uma mensagem fictícia e conferir mensagens e timestamps em `chatbox/{uid}/mensagens`. Sair da tela e reabrir: deve aparecer uma nova abertura, sem mensagens anteriores.
+6. Testar interrupção da rede, erro da API e rotação. Tentar novamente durante a sessão não deve duplicar mensagens. Encerrar o processo e reabrir deve iniciar uma conversa nova, preservando os registros já salvos no banco.
 7. No emulador ou simulador de regras do Firebase, conferir que outra conta não lê/escreve o chat, que um responsável não substitui outro e que a consulta de filhos sem filtro é recusada.
 
 Contas antigas cuja chave seja e-mail, ou que tenham somente `emailResponsavel`, precisam ser migradas para UIDs com credenciais administrativas e backup, ou ter o vínculo refeito na tela quando já possuírem perfil sob UID. O app não faz migração automática baseada em e-mails, para não atribuir filhos à conta errada.
@@ -41,7 +45,8 @@ Contas antigas cuja chave seja e-mail, ou que tenham somente `emailResponsavel`,
 ## Validação realizada nesta alteração
 
 - `:app:assembleDebug`: passou; APK em `app/build/outputs/apk/debug/app-debug.apk`.
-- `:app:testDebugUnitTest`: 12 testes passaram (8 do fluxo de chat, 3 de vínculo e 1 teste já existente).
+- `:app:testDebugUnitTest`: 17 testes passaram (4 do contrato do backend Gemini, 9 do fluxo de chat e persistência, 3 de vínculo e 1 teste já existente). Os testes de persistência usam armazenamento em memória; não comprovam permissões no Firebase ativo.
+- Backend Gemini: uma mensagem fictícia de conectividade retornou HTTP 200 com o campo `resposta`, em 13/10/2026. Nenhuma conversa real foi enviada nessa verificação.
 - JSON das regras e XMLs de recursos: sintaxe verificada.
 - `:app:lintDebug`: não concluído. O download de `com.android.tools.external.com-intellij:kotlin-compiler:31.7.3` ficou sem avançar, e o artefato não está disponível no cache para rodar offline.
 - Sem validação de ponta a ponta com contas reais, sem publicação de regras e sem migração de dados no banco ativo.

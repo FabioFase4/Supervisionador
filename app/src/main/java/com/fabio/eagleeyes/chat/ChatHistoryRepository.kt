@@ -3,14 +3,12 @@ package com.fabio.eagleeyes.chat
 import com.fabio.eagleeyes.global.FirebaseConfig
 import com.google.firebase.database.*
 import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.coroutines.tasks.await
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
 data class ChatMessage(val id: String = "", val role: String = "", val content: String = "", val createdAt: Long = 0)
 
 interface ChatHistoryStore {
-    suspend fun load(): List<ChatMessage>
     fun newMessage(text: String): ChatMessage
     suspend fun save(message: ChatMessage): ChatMessage
 }
@@ -22,17 +20,6 @@ class ChatHistoryRepository : ChatHistoryStore {
 
     private fun checkSession() {
         check(uid.isNotBlank() && FirebaseConfig.getAuth().currentUser?.uid == uid) { "Entre novamente na conta do jovem para conversar." }
-    }
-
-    override suspend fun load(): List<ChatMessage> {
-        checkSession()
-        check(db.child("usuarios/filhos").child(uid).get().await().exists()) { "O Chatbox está disponível na conta do jovem." }
-        // O histórico completo permanece no banco; a tela recupera as 100 mensagens mais recentes.
-        val snapshot = messages.orderByKey().limitToLast(100).get().await()
-        checkSession()
-        return snapshot.children.map { child ->
-            requireNotNull(child.getValue(ChatMessage::class.java)).copy(id = requireNotNull(child.key))
-        }
     }
 
     override fun newMessage(text: String): ChatMessage {

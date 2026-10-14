@@ -8,6 +8,7 @@ import kotlinx.coroutines.withTimeout
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.util.UUID
 
 data class ChatState(
     val messages: List<ChatMessage> = emptyList(),
@@ -24,7 +25,7 @@ class ChatViewModel(
     private val mutableState = MutableStateFlow(ChatState())
     val state = mutableState.asStateFlow()
     var draft = ""
-    private var loaded = false
+    private var openingSaved = false
     private var pendingReply: ChatMessage? = null
 
     init { continueConversation() }
@@ -51,21 +52,29 @@ class ChatViewModel(
         viewModelScope.launch {
             var saving = false
             try {
-                if (!loaded) {
-                    mutableState.value = state.value.copy(messages = storageOperation { history.load() })
-                    loaded = true
-                }
                 val last = state.value.messages.lastOrNull()
-                if (last == null || last.role == "user") {
-                    if (last != null) {
-                        saving = true
-                        val saved = storageOperation { history.save(last) }
-                        mutableState.value = state.value.copy(messages = state.value.messages.dropLast(1) + saved)
+                if (last == null) {
+                    // A abertura depende somente da IA, sem ler ou gravar o histórico.
+                    val opening = ChatMessage(
+                        id = "abertura-${UUID.randomUUID()}",
+                        role = "assistant",
+                        content = repository.reply(emptyList())
+                    )
+                    mutableState.value = state.value.copy(messages = listOf(opening))
+                } else if (last.role == "user") {
+                    saving = true
+                    // Ao iniciar a conversa, arquive também a abertura exibida ao jovem.
+                    if (!openingSaved) {
+                        val opening = storageOperation { history.save(state.value.messages.first()) }
+                        mutableState.value = state.value.copy(messages = listOf(opening) + state.value.messages.drop(1))
+                        openingSaved = true
                     }
+                    val saved = storageOperation { history.save(last) }
+                    mutableState.value = state.value.copy(messages = state.value.messages.dropLast(1) + saved)
                     saving = false
                     val reply = pendingReply ?: ChatMessage(
                         // A resposta fica imediatamente depois da mensagem correspondente na ordenação por chave.
-                        id = last?.let { "${it.id}_resposta" } ?: "-00000000000000000000",
+                        id = "${last.id}_resposta",
                         role = "assistant",
                         content = repository.reply(state.value.messages.map { Message(it.role, it.content) })
                     ).also { pendingReply = it }
@@ -80,7 +89,6 @@ class ChatViewModel(
             } catch (error: Exception) {
                 mutableState.value = state.value.copy(loading = false, error = when {
                     saving -> "Não foi possível confirmar o salvamento no Firebase. Confira sua conexão e tente novamente."
-                    !loaded -> "Não foi possível recuperar sua conversa. Confira a conexão e as permissões da conta e tente novamente."
                     else -> error.message ?: "A resposta foi interrompida. Tente novamente."
                 })
             }

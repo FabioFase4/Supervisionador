@@ -18,14 +18,9 @@ class ChatViewModelTest {
 
     private class MemoryHistory : ChatHistoryStore {
         val messages = linkedMapOf<String, ChatMessage>()
-        var failLoad = false
         var failRole: String? = null
         var failAfterCommit = false
         private var next = 0
-        override suspend fun load(): List<ChatMessage> {
-            if (failLoad) error("Sem conexão")
-            return messages.values.toList()
-        }
         override fun newMessage(text: String) = ChatMessage("user-${++next}", "user", text)
         override suspend fun save(message: ChatMessage): ChatMessage {
             if (failRole == message.role && !failAfterCommit) error("Gravação recusada")
@@ -35,26 +30,28 @@ class ChatViewModelTest {
         }
     }
 
-    @Test fun restoresHistoryWithoutRequestingAnotherOpening() = runTest(dispatcher) {
-        val history = MemoryHistory().apply { messages["welcome"] = ChatMessage("welcome", "assistant", "Olá") }
-        val model = ChatViewModel(ChatResponder { error("Não deve chamar a API") }, history)
+    @Test fun startsFreshWithoutReadingOrChangingTheStoredConversation() = runTest(dispatcher) {
+        val history = MemoryHistory().apply { messages["old"] = ChatMessage("old", "user", "Conversa antiga") }
+        val model = ChatViewModel(ChatResponder { messages ->
+            assertTrue(messages.isEmpty())
+            "Mensagem do dia"
+        }, history)
         advanceUntilIdle()
-        assertEquals("Olá", model.state.value.messages.single().content)
+        assertEquals("Mensagem do dia", model.state.value.messages.single().content)
+        assertEquals(listOf("old"), history.messages.keys.toList())
         assertTrue(model.state.value.canSend)
     }
 
-    @Test fun doesNotCallApiWhenLoadingHistoryFails() = runTest(dispatcher) {
-        val history = MemoryHistory().apply { failLoad = true }
-        var requests = 0
-        val model = ChatViewModel(ChatResponder { requests++; "Olá" }, history)
+    @Test fun displaysDailyOpeningWithoutAnyFirebaseOperation() = runTest(dispatcher) {
+        val history = object : ChatHistoryStore {
+            override fun newMessage(text: String): ChatMessage = error("Não deve acessar o Firebase")
+            override suspend fun save(message: ChatMessage): ChatMessage = error("Permissão negada")
+        }
+        val model = ChatViewModel(ChatResponder { "Olá" }, history)
         advanceUntilIdle()
-        assertEquals(0, requests)
-        assertFalse(model.state.value.canSend)
-        history.failLoad = false
-        model.retry()
-        advanceUntilIdle()
-        assertEquals(1, requests)
-        assertEquals(1, history.messages.size)
+        assertEquals("Olá", model.state.value.messages.single().content)
+        assertNull(model.state.value.error)
+        assertTrue(model.state.value.canSend)
     }
 
     @Test fun persistsUserBeforeCallingApiAndRetriesWithoutDuplicate() = runTest(dispatcher) {
@@ -76,28 +73,44 @@ class ChatViewModelTest {
     }
 
     @Test fun retriesSavingTheSameReplyWithoutCallingApiAgain() = runTest(dispatcher) {
-        val history = MemoryHistory().apply { failRole = "assistant"; failAfterCommit = true }
+        val history = MemoryHistory()
         var requests = 0
-        val model = ChatViewModel(ChatResponder { requests++; "Olá" }, history)
+        val model = ChatViewModel(ChatResponder { messages ->
+            requests++
+            if (messages.isNotEmpty()) {
+                history.failRole = "assistant"
+                history.failAfterCommit = true
+            }
+            "Olá"
+        }, history)
+        advanceUntilIdle()
+        model.send("Meu dia")
         advanceUntilIdle()
         assertNotNull(model.state.value.error)
         history.failRole = null
         model.retry()
         advanceUntilIdle()
-        assertEquals(1, requests)
-        assertEquals(1, history.messages.size)
+        assertEquals(2, requests)
+        assertEquals(3, history.messages.size)
         assertTrue(model.state.value.canSend)
     }
 
-    @Test fun resumesUnansweredPersistedUserMessage() = runTest(dispatcher) {
-        val history = MemoryHistory().apply { messages["pending"] = ChatMessage("pending", "user", "Oi") }
-        val model = ChatViewModel(ChatResponder { messages ->
-            assertEquals("Oi", messages.last().content)
+    @Test fun retriesFailedDailyOpeningWithoutSavingAnything() = runTest(dispatcher) {
+        val history = MemoryHistory()
+        var fail = true
+        val model = ChatViewModel(ChatResponder {
+            if (fail) throw ChatException("Sem conexão com a IA")
             "Olá"
         }, history)
         advanceUntilIdle()
-        assertEquals(2, history.messages.size)
-        assertEquals("pending_resposta", model.state.value.messages.last().id)
+        assertNotNull(model.state.value.error)
+        assertTrue(model.state.value.messages.isEmpty())
+        fail = false
+        model.retry()
+        advanceUntilIdle()
+        assertEquals("Olá", model.state.value.messages.single().content)
+        assertTrue(history.messages.isEmpty())
+        assertTrue(model.state.value.canSend)
     }
 
     @Test fun apiFailureDoesNotDuplicateUserOnRetry() = runTest(dispatcher) {
@@ -128,14 +141,38 @@ class ChatViewModelTest {
 
     @Test fun stalledFirebaseWriteOffersRetryInsteadOfLoadingForever() = runTest(dispatcher) {
         val store = object : ChatHistoryStore {
-            override suspend fun load() = emptyList<ChatMessage>()
-            override fun newMessage(text: String) = error("Sem envio")
+            override fun newMessage(text: String) = ChatMessage("user-1", "user", text)
             override suspend fun save(message: ChatMessage): ChatMessage = awaitCancellation()
         }
         val model = ChatViewModel(ChatResponder { "Olá" }, store)
         advanceUntilIdle()
+        assertTrue(model.state.value.canSend)
+        model.send("Meu dia")
+        advanceUntilIdle()
         assertFalse(model.state.value.loading)
         assertNotNull(model.state.value.error)
         assertFalse(model.state.value.canSend)
+    }
+
+    @Test fun savesBothSidesButStartsANewConversationWhenReopened() = runTest(dispatcher) {
+        val history = MemoryHistory()
+        val model = ChatViewModel(ChatResponder { "Resposta da IA" }, history)
+        advanceUntilIdle()
+        repeat(55) { index ->
+            model.send("Mensagem $index")
+            advanceUntilIdle()
+        }
+        assertEquals(55, history.messages.values.count { it.role == "user" })
+        assertEquals(56, history.messages.values.count { it.role == "assistant" })
+        assertTrue(history.messages.values.all { it.createdAt > 0 })
+        val reopened = ChatViewModel(ChatResponder { messages ->
+            assertTrue(messages.isEmpty())
+            "Nova abertura"
+        }, history)
+        advanceUntilIdle()
+        assertEquals("Nova abertura", reopened.state.value.messages.single().content)
+        assertNotEquals(model.state.value.messages.first().id, reopened.state.value.messages.first().id)
+        assertEquals(111, history.messages.size)
+        assertTrue(reopened.state.value.canSend)
     }
 }

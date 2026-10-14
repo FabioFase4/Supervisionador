@@ -7,11 +7,11 @@
     <string name="chatbox_history">SUA CONVERSA</string>
     <string name="chatbox_input_hint">Escreva do seu jeito…</string>
     <string name="chatbox_send">Enviar mensagem</string>
-    <string name="chatbox_loading_initial">Preparando uma pergunta para você…</string>
+    <string name="chatbox_loading_initial">Preparando sua mensagem do dia…</string>
     <string name="chatbox_loading_reply">Pensando na sua mensagem…</string>
     <string name="chatbox_retry">Tentar novamente</string>
     <string name="chatbox_disclaimer">Você conversa com uma IA. Este espaço não substitui apoio profissional.</string>
     <string name="chatbox_about">Sobre este espaço</string>
-    <string name="chatbox_about_body">O Chatbox é uma IA para conversar e oferecer apoio emocional. Ele pode errar e não faz diagnósticos nem substitui um psicólogo.\n\nAs mensagens e respostas são salvas no Firebase, associadas à sua conta, e recuperadas quando você volta ao chat.\n\nSuas mensagens são enviadas ao OpenRouter e ao provedor de IA para gerar respostas. Evite compartilhar dados que identifiquem você ou outras pessoas.\n\nSe precisar de apoio, procure uma pessoa de confiança ou um profissional. Em perigo imediato, busque ajuda presencial e o serviço de emergência da sua região. O app não monitora emergências nem aciona ajuda por você.</string>
+    <string name="chatbox_about_body">O Chatbox é uma IA para conversar e oferecer apoio emocional. Ele pode errar e não faz diagnósticos nem substitui um psicólogo.\n\nAo abrir, você recebe uma nova mensagem para o dia, sem carregar conversas anteriores. Quando você envia uma mensagem, a conversa é salva no Firebase, associada à sua conta.\n\nSuas mensagens são enviadas ao serviço Gemini do app para gerar respostas. Evite compartilhar dados que identifiquem você ou outras pessoas.\n\nSe precisar de apoio, procure uma pessoa de confiança ou um profissional. Em perigo imediato, busque ajuda presencial e o serviço de emergência da sua região. O app não monitora emergências nem aciona ajuda por você.</string>
     <string name="chatbox_close">Entendi</string>
 </resources>
