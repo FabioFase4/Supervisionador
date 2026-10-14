@@ -31,9 +31,7 @@ class UsuarioViewModel : ViewModel() {
     fun cadastrar(usuario: Usuario, caminho: String) {
         viewModelScope.launch {
             try {
-                // Sanitiza o email para usar como chave no Firebase (não permite pontos)
-                val emailChave = usuario.email.replace(".", ",")
-                database.child(caminho).child(emailChave).setValue(usuario).await()
+                UsuarioDAO().cadastrar(usuario, caminho)
 
                 _sucesso.value = caminho
             } catch (e: Exception) {
@@ -44,15 +42,15 @@ class UsuarioViewModel : ViewModel() {
 
     /**
      * 3. FUNÇÃO DE CARREGAR FILHOS
-     * Busca no banco de dados os filhos vinculados ao e-mail do pai logado
+     * Busca no banco de dados os filhos vinculados ao UID do pai logado
      */
-    fun carregarFilhos(emailPai: String) {
+    fun carregarFilhos(uidPai: String) {
         viewModelScope.launch {
             try {
-                // CORREÇÃO: Usando o caminho 'usuarios/filhos' e o campo 'emailResponsavel'
+                // O vínculo usa o UID do responsável.
                 val snapshot = database.child("usuarios/filhos")
-                    .orderByChild("emailResponsavel")
-                    .equalTo(emailPai)
+                    .orderByChild("idResponsavel")
+                    .equalTo(uidPai)
                     .get().await()
 
                 val lista = ArrayList<Usuario>()
@@ -61,6 +59,7 @@ class UsuarioViewModel : ViewModel() {
                     for (filhoSnapshot in snapshot.children) {
                         val childUsuario = filhoSnapshot.getValue(Usuario::class.java)
                         if (childUsuario != null) {
+                            childUsuario.uid = filhoSnapshot.key.orEmpty()
                             lista.add(childUsuario)
                         }
                     }

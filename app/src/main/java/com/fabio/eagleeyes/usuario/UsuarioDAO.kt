@@ -36,19 +36,19 @@ class UsuarioDAO {
      * Lança exceção em caso de erro para que o ViewModel possa capturar a mensagem real.
      */
     suspend fun cadastrar(usuario: Usuario, local: String): String? {
-        if (emailExiste(usuario.email))
-            throw Exception("Este e-mail já está sendo usado.")
-
-        if (telefoneExiste(usuario.telefone))
-            throw Exception("Este telefone já está sendo usado.")
-
-        val resultado = auth.createUserWithEmailAndPassword(usuario.email, usuario.senha).await()
-        val uid = resultado.user?.uid ?: throw Exception("Falha ao obter ID do usuário.")
-
-        usuario.uid = uid
-        // Salva os dados no banco usando o UID como chave
-        rootDb.child(local).child(uid).setValue(usuario).await()
-        return uid
+        val cadastro = com.fabio.eagleeyes.cadastro.CadastroDAO()
+        when (usuario) {
+            is UsuarioPai -> {
+                require(local == "usuarios/pais")
+                cadastro.salvarUsuarioPai(usuario, local)
+            }
+            is UsuarioFilho -> {
+                require(local == "usuarios/filhos")
+                cadastro.salvarUsuarioFilho(usuario, local)
+            }
+            else -> error("Tipo de perfil inválido.")
+        }
+        return usuario.uid
     }
 
     suspend fun emailExiste(email: String): Boolean {
@@ -82,15 +82,10 @@ class UsuarioDAO {
     }
 
     suspend fun listarFilhosDoPai(uidPai: String): List<Usuario> {
-        return try {
-            val snapshot = rootDb.child("usuarios/filhos")
-                .orderByChild("idResponsavel")
-                .equalTo(uidPai)
-                .get().await()
-
-            snapshot.children.mapNotNull { it.getValue(Usuario::class.java) }
-        } catch (e: Exception) {
-            emptyList()
+        val snapshot = rootDb.child("usuarios/filhos")
+            .orderByChild("idResponsavel").equalTo(uidPai).get().await()
+        return snapshot.children.mapNotNull { child ->
+            child.getValue(Usuario::class.java)?.apply { uid = child.key.orEmpty() }
         }
     }
 

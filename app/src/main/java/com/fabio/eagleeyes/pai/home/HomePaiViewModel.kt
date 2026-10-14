@@ -9,6 +9,8 @@ import com.fabio.eagleeyes.repositorio.AnaliseRepositorio
 import com.fabio.eagleeyes.global.FirebaseConfig
 import com.fabio.eagleeyes.viewmodel.HomeViewModel
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.tasks.await
 
 class HomePaiViewModel(
@@ -22,6 +24,8 @@ class HomePaiViewModel(
     private val _perfilPai = MutableLiveData<Usuario?>()
     val perfilPai: LiveData<Usuario?> get() = _perfilPai
 
+    private var filhosJob: Job? = null
+
     fun carregarDadosIniciais(uid: String) {
         viewModelScope.launch {
             _carregando.value = true
@@ -29,8 +33,7 @@ class HomePaiViewModel(
                 val pai = repository.buscarPai(uid)
                 _perfilPai.value = pai
                 
-                val email = pai?.email ?: FirebaseConfig.getAuth().currentUser?.email
-                email?.let { carregarFilhosInternal(it) }
+                carregarFilhos(uid)
             } catch (e: Exception) {
                 _erro.value = "Erro ao carregar perfil: ${e.localizedMessage}"
             } finally {
@@ -39,21 +42,23 @@ class HomePaiViewModel(
         }
     }
 
-    fun carregarFilhos(emailPai: String) {
-        viewModelScope.launch {
-            carregarFilhosInternal(emailPai)
-        }
-    }
-
-    private suspend fun carregarFilhosInternal(emailPai: String) {
-        _carregando.value = true
-        try {
-            val filhos = repository.listarFilhos(emailPai)
-            _listaFilhos.value = filhos
-        } catch (e: Exception) {
-            _erro.value = "Erro ao buscar filhos: ${e.localizedMessage}"
-        } finally {
-            _carregando.value = false
+    fun carregarFilhos(uidPai: String) {
+        filhosJob?.cancel()
+        filhosJob = viewModelScope.launch {
+            _carregando.value = true
+            try {
+                repository.observarFilhos(uidPai).collect { filhos ->
+                    _listaFilhos.value = filhos
+                    _erro.value = ""
+                    _carregando.value = false
+                }
+            } catch (error: CancellationException) {
+                throw error
+            } catch (error: Exception) {
+                _erro.value = "Não foi possível buscar os filhos: ${error.localizedMessage}"
+            } finally {
+                _carregando.value = false
+            }
         }
     }
 

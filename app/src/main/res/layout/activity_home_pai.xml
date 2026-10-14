@@ -155,7 +155,7 @@
             android:layout_width="0dp"
             android:layout_height="52dp"
             android:layout_marginTop="32dp"
-            android:text="Instruções de vínculo"
+            android:text="Vincular contas pelo ID"
             android:textAllCaps="false"
             android:textColor="@color/brand_blue"
             android:textSize="14sp"

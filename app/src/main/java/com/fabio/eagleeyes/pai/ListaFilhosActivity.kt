@@ -14,14 +14,13 @@ import com.fabio.eagleeyes.pai.home.HomePaiDAO
 import com.fabio.eagleeyes.pai.home.HomePaiRepository
 import com.fabio.eagleeyes.pai.home.HomePaiViewModel
 import com.fabio.eagleeyes.pai.home.HomePaiViewModelFactory
-import com.fabio.eagleeyes.cadastro.CadastroOpcoesActivity
+import com.fabio.eagleeyes.vinculo.VinculoActivity
 
 class ListaFilhosActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityListaFilhosBinding
     private lateinit var viewModel: HomePaiViewModel
     private lateinit var adapter: FilhoAdapter
-    private var emailPai: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,15 +28,14 @@ class ListaFilhosActivity : AppCompatActivity() {
         binding = ActivityListaFilhosBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        emailPai = intent.getStringExtra("EMAIL_PAI")
-
         setupArchitecture()
         setupRecyclerView()
         setupObservers()
         setupCliques()
 
         // Carrega a lista de filhos vinculados a este pai
-        emailPai?.let { viewModel.carregarFilhos(it) }
+        val uid = FirebaseConfig.getAuth().currentUser?.uid
+        if (uid == null) finish() else viewModel.carregarFilhos(uid)
     }
 
     private fun setupArchitecture() {
@@ -61,11 +59,15 @@ class ListaFilhosActivity : AppCompatActivity() {
         }
 
         viewModel.listaFilhos.observe(this) { filhos ->
+            binding.txtListaVazia.text = "Nenhum filho vinculado. Toque em Adicionar filho pelo ID."
             adapter.updateList(filhos ?: emptyList())
+            binding.txtListaVazia.visibility = if (filhos.isNullOrEmpty()) View.VISIBLE else View.GONE
         }
 
         viewModel.erro.observe(this) { msg ->
             if (!msg.isNullOrEmpty()) {
+                binding.txtListaVazia.text = msg
+                binding.txtListaVazia.visibility = View.VISIBLE
                 Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
             }
         }
@@ -73,10 +75,7 @@ class ListaFilhosActivity : AppCompatActivity() {
 
     private fun setupCliques() {
         binding.btnCadastrarFilho.setOnClickListener {
-            // Direciona para a tela de opções, mas aqui o contexto já é de adicionar um filho
-            val intent = Intent(this, CadastroOpcoesActivity::class.java)
-            intent.putExtra("VINCULO_MODO", true) 
-            startActivity(intent)
+            startActivity(Intent(this, VinculoActivity::class.java))
         }
 
         binding.btnVoltar.setOnClickListener {

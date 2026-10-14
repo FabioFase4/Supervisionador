@@ -7,7 +7,7 @@ class UsuarioFilho (
     telefone: String,
     cpf: String,
     genero: String,
-    idResponsavel: String
+    idResponsavel: String? = null
 ) : Usuario(
     nome = nome,
     email = email,

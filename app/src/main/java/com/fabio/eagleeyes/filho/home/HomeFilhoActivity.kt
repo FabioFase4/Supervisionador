@@ -84,6 +84,13 @@ class HomeFilhoActivity : BaseHomeActivity<ActivityHomeFilhoBinding>() {
     }
 
     private fun configurarCliques() {
+        binding.btnChatbox.setOnClickListener {
+            startActivity(Intent(this, com.fabio.eagleeyes.chat.ChatActivity::class.java))
+        }
+        binding.btnVincularContas.setOnClickListener {
+            startActivity(Intent(this, com.fabio.eagleeyes.vinculo.VinculoActivity::class.java))
+        }
+
         binding.btnVerHistorico.setOnClickListener {
             val intent = Intent(this, RelatorioFilhoActivity::class.java).apply {
                 putExtra("FILHO_UID", FirebaseConfig.getAuth().currentUser?.uid)

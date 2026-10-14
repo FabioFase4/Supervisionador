@@ -1,0 +1,12 @@
+<resources>
+    <style name="Base.Theme.Chatbox" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/chat_primary</item>
+        <item name="colorOnPrimary">@color/chat_on_primary</item>
+        <item name="colorSurface">@color/chat_surface</item>
+        <item name="android:colorBackground">@color/chat_background</item>
+        <item name="android:windowBackground">@color/chat_background</item>
+        <item name="android:fontFamily">sans</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+    <style name="Theme.Chatbox" parent="Base.Theme.Chatbox" />
+</resources>

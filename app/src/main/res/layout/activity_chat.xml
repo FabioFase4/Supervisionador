@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main" android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:gravity="center_vertical" android:paddingHorizontal="20dp" android:paddingVertical="12dp">
+        <com.google.android.material.button.MaterialButton android:id="@+id/btnChatVoltar" style="@style/Widget.Material3.Button.TextButton" android:layout_width="wrap_content" android:layout_height="48dp" android:text="Voltar" />
+        <ImageView android:layout_width="48dp" android:layout_height="48dp" android:padding="10dp"
+            android:src="@drawable/chatbox_ic_chat" android:background="@drawable/chatbox_bg_welcome" android:importantForAccessibility="no" />
+        <LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content"
+            android:orientation="vertical" android:layout_marginStart="12dp">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="@string/chatbox_app_name" android:textSize="21sp" android:textStyle="bold" android:textColor="@color/chat_text" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="@string/chatbox_tagline" android:textSize="12sp" android:textColor="@color/chat_muted" />
+        </LinearLayout>
+        <com.google.android.material.button.MaterialButton android:id="@+id/btnAbout"
+            style="@style/Widget.Material3.Button.TextButton" android:layout_width="48dp" android:layout_height="48dp"
+            android:minWidth="0dp" android:padding="0dp" android:text="?" android:textSize="20sp"
+            android:contentDescription="@string/chatbox_about" />
+    </LinearLayout>
+
+    <ScrollView android:id="@+id/scrollView" android:layout_width="match_parent" android:layout_height="0dp"
+        android:layout_weight="1" android:fillViewport="true" android:clipToPadding="false"
+        android:paddingHorizontal="20dp" android:paddingBottom="16dp" android:scrollbars="none">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="12dp" android:padding="24dp" android:orientation="vertical" android:background="@drawable/chatbox_bg_welcome">
+                <TextView android:id="@+id/welcomeTitle" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="@string/chatbox_welcome_title" android:textSize="30sp" android:fontFamily="sans-serif-medium"
+                    android:lineSpacingExtra="2dp" android:textColor="@color/chat_text" />
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp"
+                    android:text="@string/chatbox_welcome_body" android:textSize="15sp" android:lineSpacingExtra="4dp" android:textColor="@color/chat_muted" />
+            </LinearLayout>
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginVertical="24dp"
+                android:gravity="center" android:text="@string/chatbox_history" android:textSize="11sp" android:letterSpacing="0.15" android:textColor="@color/chat_muted" />
+            <LinearLayout android:id="@+id/chatContainer" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" />
+            <LinearLayout android:id="@+id/loadingContainer" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:gravity="center_vertical" android:padding="16dp" android:orientation="horizontal">
+                <com.google.android.material.progressindicator.CircularProgressIndicator android:layout_width="24dp" android:layout_height="24dp"
+                    android:indeterminate="true" app:indicatorSize="20dp" app:trackThickness="2dp" />
+                <TextView android:id="@+id/loadingText" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp" android:text="@string/chatbox_loading_initial" android:textColor="@color/chat_muted"
+                    android:textSize="14sp" android:accessibilityLiveRegion="polite" />
+            </LinearLayout>
+            <LinearLayout android:id="@+id/errorContainer" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:padding="16dp" android:background="@drawable/chatbox_bg_surface" android:orientation="vertical" android:visibility="gone">
+                <TextView android:id="@+id/errorText" android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:textColor="@color/chat_error" android:textSize="14sp" android:accessibilityLiveRegion="polite" />
+                <com.google.android.material.button.MaterialButton android:id="@+id/btnRetry" style="@style/Widget.Material3.Button.TextButton"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/chatbox_retry" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical"
+        android:paddingHorizontal="16dp" android:paddingTop="8dp" android:paddingBottom="10dp">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:background="@drawable/chatbox_bg_surface"
+            android:padding="6dp" android:gravity="bottom">
+            <EditText android:id="@+id/inputMensagem" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content"
+                android:minHeight="48dp" android:paddingHorizontal="14dp" android:paddingVertical="12dp"
+                android:background="@null" android:hint="@string/chatbox_input_hint" android:textColorHint="@color/chat_muted"
+                android:textColor="@color/chat_text" android:textSize="16sp" android:inputType="textCapSentences|textMultiLine"
+                android:maxLines="4" android:maxLength="4000" android:imeOptions="actionSend" android:importantForAutofill="no" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/btnEnviar" android:layout_width="48dp" android:layout_height="48dp"
+                android:minWidth="0dp" android:minHeight="0dp" android:padding="12dp" android:insetTop="0dp" android:insetBottom="0dp"
+                android:contentDescription="@string/chatbox_send" app:cornerRadius="20dp" app:icon="@drawable/chatbox_ic_send"
+                app:iconTint="@color/chat_on_primary" app:iconPadding="0dp" app:iconGravity="textStart" />
+        </LinearLayout>
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp"
+            android:paddingHorizontal="8dp" android:gravity="center" android:text="@string/chatbox_disclaimer"
+            android:textSize="11sp" android:textColor="@color/chat_muted" />
+    </LinearLayout>
+</LinearLayout>

@@ -13,6 +13,14 @@ if (localPropertiesFile.exists()) {
     localProperties.load(localPropertiesFile.inputStream())
 }
 
+val chatboxProperties = Properties().apply {
+    rootProject.file("../chatbox/local.properties").takeIf { it.exists() }?.inputStream()?.use { load(it) }
+}
+fun chatConfig(name: String, fallback: String = ""): String =
+    (System.getenv(name) ?: localProperties.getProperty(name)
+        ?: chatboxProperties.getProperty(name) ?: fallback)
+        .replace("\\", "\\\\").replace("\"", "\\\"")
+
 android {
     namespace = "com.fabio.eagleeyes"
     compileSdk = 34
@@ -29,6 +37,8 @@ android {
         versionCode = 1
         versionName = "3.2.1"
         multiDexEnabled = true
+        buildConfigField("String", "OPENROUTER_API_KEY", "\"${chatConfig("OPENROUTER_API_KEY")}\"")
+        buildConfigField("String", "OPENROUTER_MODEL", "\"${chatConfig("OPENROUTER_MODEL", "dots-studio/dots-3-note-preview:free")}\"")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         resourceConfigurations += listOf("en", "pt-rBR")
 
@@ -70,6 +80,9 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")
     implementation("org.mindrot:jbcrypt:0.4")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.9.0")
+    testImplementation(libs.junit)
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.9.0")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
     implementation("com.google.firebase:firebase-database")

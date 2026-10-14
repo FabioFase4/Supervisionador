@@ -84,6 +84,17 @@
             app:layout_constraintTop_toBottomOf="@id/lblAcoes">
 
             <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnChatbox" style="@style/Widget.EagleEyes.Button"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:minHeight="56dp" android:layout_marginBottom="12dp"
+                android:text="Conversar com o Chatbox" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnVincularContas" style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:minHeight="56dp" android:layout_marginBottom="12dp"
+                android:text="Vincular responsável pelo ID" />
+
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnVerHistorico"
                 style="@style/Widget.EagleEyes.Button"
                 android:layout_width="match_parent"

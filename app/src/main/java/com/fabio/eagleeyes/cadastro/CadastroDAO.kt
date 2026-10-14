@@ -47,7 +47,8 @@ class CadastroDAO {
 
         } catch (e: Exception) {
             // Se houver qualquer erro, removemos o usuário do Auth
-            auth.currentUser?.delete()?.await()
+            usuario.senha = senhaPura
+            resultado.user?.delete()?.await()
             throw e
         }
     }
@@ -64,16 +65,19 @@ class CadastroDAO {
         verificarTelefoneDuplicado(usuario.telefone)
         verificarCPFDuplicado(usuario.cpf)
 
-        // Verifica a quantidade de filhos do responsável usando o ID do Responsável (UID)
-        if (noDestino == "usuarios/filhos") {
-            verificarQuantidadeFilhos(usuario.idResponsavel ?: "")
-        }
+        usuario.idResponsavel = usuario.idResponsavel?.trim()?.takeIf { it.isNotEmpty() }
 
         // 2. Cria o usuário no Firebase Authentication
         val resultado = auth.createUserWithEmailAndPassword(emailFormatado, senhaPura).await()
         val uid = resultado.user?.uid ?: throw Exception("Não foi possível criar a autenticação.")
 
         try {
+            usuario.idResponsavel?.let { id ->
+                com.fabio.eagleeyes.vinculo.VinculoPolicy.normalizarId(id)
+                check(db.child("usuarios/pais").child(id).child("nome").get().await().exists()) {
+                    "Responsável não encontrado. Confira o ID ou deixe em branco para vincular depois."
+                }
+            }
             // 3. Criptografia e formatação
             val senhaCriptografada = withContext(Dispatchers.Default) {
                 BCrypt.hashpw(senhaPura, BCrypt.gensalt())
@@ -92,7 +96,8 @@ class CadastroDAO {
 
         } catch (e: Exception) {
             // Se houver qualquer erro, removemos o usuário do Auth
-            auth.currentUser?.delete()?.await()
+            usuario.senha = senhaPura
+            resultado.user?.delete()?.await()
             throw e
         }
     }
@@ -143,35 +148,4 @@ class CadastroDAO {
         }
     }
 
-    private suspend fun verificarQuantidadeFilhos(idResponsavel: String) {
-        val idFormatado = idResponsavel.trim()
-
-        if (idFormatado.isEmpty()) {
-            throw Exception("O ID do responsável é obrigatório para cadastrar um filho.")
-        }
-
-        // 1. Busca o responsável pelo UID para verificar o limite cadastrado
-        val snapshotPai = db.child("usuarios/pais").child(idFormatado).get().await()
-
-        if (!snapshotPai.exists()) {
-            throw Exception("O ID do responsável informado não foi encontrado.")
-        }
-
-        // Obtém o limite de filhos do cadastro do pai
-        // Usando "numeroFilhos" que é o nome da propriedade na classe UsuarioPai
-        val limite = snapshotPai.child("numeroFilhos").value?.toString()?.toIntOrNull() ?: 0
-
-        // 2. Conta quantos filhos já estão vinculados a este responsável via ID
-        val snapshotFilhos = db.child("usuarios/filhos")
-            .orderByChild("idResponsavel")
-            .equalTo(idFormatado)
-            .get()
-            .await()
-
-        val totalFilhosJaCadastrados = snapshotFilhos.childrenCount
-
-        if (totalFilhosJaCadastrados >= limite) {
-            throw Exception("O limite de filhos ($limite) para este responsável já foi alcançado.")
-        }
-    }
 }

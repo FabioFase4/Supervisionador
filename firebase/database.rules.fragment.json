@@ -1,0 +1,42 @@
+{
+  "rules": {
+    "usuarios": {
+      "pais": {
+        ".indexOn": ["email", "telefone", "cpf"],
+        "$uid": {
+          ".read": "auth != null && auth.uid == $uid",
+          "nome": { ".read": "auth != null" }
+        }
+      },
+      "filhos": {
+        ".indexOn": ["idResponsavel", "email", "telefone", "cpf"],
+        ".read": "auth != null && root.child('usuarios/pais').child(auth.uid).exists() && query.orderByChild == 'idResponsavel' && query.equalTo == auth.uid",
+        "$uid": {
+          ".read": "auth != null && (auth.uid == $uid || data.child('idResponsavel').val() == auth.uid)",
+          "nome": { ".read": "auth != null" },
+          "idResponsavel": {
+            ".read": "auth != null",
+            ".write": "auth != null && root.child('usuarios/filhos').child($uid).exists() && newData.isString() && root.child('usuarios/pais').child(newData.val()).exists() && (auth.uid == $uid || auth.uid == newData.val()) && (!data.exists() || data.val() == '' || data.val() == newData.val())",
+            ".validate": "newData.isString() && root.child('usuarios/pais').child(newData.val()).exists() && (!data.exists() || data.val() == '' || data.val() == newData.val())"
+          }
+        }
+      }
+    },
+    "chatbox": {
+      "$uid": {
+        ".read": "auth != null && auth.uid == $uid && root.child('usuarios/filhos').child($uid).exists()",
+        "mensagens": {
+          "$messageId": {
+            ".write": "auth != null && auth.uid == $uid && root.child('usuarios/filhos').child($uid).exists() && newData.exists() && (!data.exists() || (newData.child('id').val() == data.child('id').val() && newData.child('role').val() == data.child('role').val() && newData.child('content').val() == data.child('content').val() && newData.child('createdAt').val() == data.child('createdAt').val()))",
+            ".validate": "newData.hasChildren(['id', 'role', 'content', 'createdAt'])",
+            "id": { ".validate": "newData.isString() && newData.val() == $messageId" },
+            "role": { ".validate": "newData.val() == 'user' || newData.val() == 'assistant'" },
+            "content": { ".validate": "newData.isString() && newData.val().length > 0 && ((newData.parent().child('role').val() == 'user' && newData.val().length <= 4000) || (newData.parent().child('role').val() == 'assistant' && newData.val().length <= 32000))" },
+            "createdAt": { ".validate": "newData.isNumber() && newData.val() <= now" },
+            "$other": { ".validate": false }
+          }
+        }
+      }
+    }
+  }
+}

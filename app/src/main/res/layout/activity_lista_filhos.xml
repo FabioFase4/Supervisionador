@@ -56,7 +56,7 @@
         android:layout_height="52dp"
         android:layout_marginBottom="12dp"
         android:backgroundTint="@color/brand_blue"
-        android:text="Adicionar novo filho"
+        android:text="Adicionar filho pelo ID"
         app:layout_constraintBottom_toTopOf="@id/btnVoltar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -75,6 +75,13 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView android:id="@+id/txtListaVazia"
+        android:layout_width="0dp" android:layout_height="wrap_content"
+        android:padding="24dp" android:gravity="center" android:visibility="gone"
+        android:text="Nenhum filho vinculado. Toque em Adicionar filho pelo ID."
+        app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/rvFilhos" />
 
     <ProgressBar
         android:id="@+id/progressBar"

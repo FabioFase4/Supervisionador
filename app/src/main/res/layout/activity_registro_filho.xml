@@ -66,8 +66,8 @@
                 style="@style/Widget.EagleEyes.TextInputLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="ID do Responsável"
-                app:helperText="Código fornecido pelo seu pai">
+                android:hint="ID do Responsável (opcional)"
+                app:helperText="Você também pode vincular as contas dentro do app depois.">
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/edtIDResponsavel"
                     style="@style/Widget.EagleEyes.TextInputEditText"

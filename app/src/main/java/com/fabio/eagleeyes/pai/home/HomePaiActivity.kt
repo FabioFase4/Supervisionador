@@ -5,7 +5,7 @@ import android.content.Intent
 import android.os.Build
 import android.view.View
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
+import com.fabio.eagleeyes.vinculo.VinculoActivity
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModelProvider
 import com.fabio.eagleeyes.alerta.activitiy.AlertasActivity
@@ -25,6 +25,7 @@ class HomePaiActivity : BaseHomeActivity<ActivityHomePaiBinding>() {
         setupViewModel()
         setupObservers()
         verificarPermissoesNecessarias()
+        configurarCliques()
         carregarDados()
     }
 
@@ -46,11 +47,6 @@ class HomePaiActivity : BaseHomeActivity<ActivityHomePaiBinding>() {
     }
 
     private fun setupObservers() {
-        viewModel.perfilPai.observe(this) { pai ->
-            val email = pai?.email ?: FirebaseConfig.getAuth().currentUser?.email
-            configurarCliques(email)
-        }
-
         viewModel.carregando.observe(this) { estaCarregando ->
             controlarLoading(estaCarregando)
             binding.btnPerguntarIA.isEnabled = !estaCarregando
@@ -68,10 +64,9 @@ class HomePaiActivity : BaseHomeActivity<ActivityHomePaiBinding>() {
         }
     }
 
-    private fun configurarCliques(emailPai: String?) {
+    private fun configurarCliques() {
         binding.btnMeusFilhos.setOnClickListener {
             val intent = Intent(this, ListaFilhosActivity::class.java)
-            intent.putExtra("EMAIL_PAI", emailPai)
             startActivity(intent)
         }
 
@@ -80,12 +75,7 @@ class HomePaiActivity : BaseHomeActivity<ActivityHomePaiBinding>() {
         }
 
         binding.btnInstrucoesVinculo.setOnClickListener {
-            val uid = FirebaseConfig.getAuth().currentUser?.uid ?: ""
-            AlertDialog.Builder(this)
-                .setTitle("Como Vincular")
-                .setMessage("Para monitorar um dispositivo, seu filho deve informar este ID no cadastro:\n\n$uid")
-                .setPositiveButton("Ok", null)
-                .show()
+            startActivity(Intent(this, VinculoActivity::class.java))
         }
 
         binding.btnPerguntarIA.setOnClickListener {

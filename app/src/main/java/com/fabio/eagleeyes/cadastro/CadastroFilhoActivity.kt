@@ -1,7 +1,6 @@
 package com.fabio.eagleeyes.cadastro
 
 import com.fabio.eagleeyes.databinding.ActivityRegistroFilhoBinding
-import com.fabio.eagleeyes.global.Validator
 import com.fabio.eagleeyes.usuario.UsuarioFilho
 
 class CadastroFilhoActivity : CadastroActivity<ActivityRegistroFilhoBinding>() {
@@ -12,11 +11,10 @@ class CadastroFilhoActivity : CadastroActivity<ActivityRegistroFilhoBinding>() {
         binding.btnCadastrar.setOnClickListener {
             val camposComuns = binding.layoutCamposComuns
             
-            // Valida campos comuns e o ID do Responsável (UID do Pai)
+            // O vínculo também pode ser criado após o cadastro.
             val baseValida = validarCamposBase(camposComuns)
-            val idValido = Validator.validarCampoVazio(binding.layoutIDResponsavel)
 
-            if (baseValida && idValido) {
+            if (baseValida) {
                 val filho = UsuarioFilho(
                     nome = camposComuns.edtNome.text.toString().trim(),
                     email = camposComuns.edtEmail.text.toString().trim(),

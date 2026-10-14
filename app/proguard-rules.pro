@@ -1,4 +1,8 @@
 # Firebase Rules
+-keep class com.fabio.eagleeyes.usuario.Usuario { *; }
+-keep class com.fabio.eagleeyes.usuario.UsuarioPai { *; }
+-keep class com.fabio.eagleeyes.usuario.UsuarioFilho { *; }
+-keep class com.fabio.eagleeyes.chat.ChatMessage { *; }
 -keepclassmembers class com.google.firebase.** { *; }
 -keep class com.google.firebase.** { *; }
 -keep class com.google.android.gms.** { *; }

@@ -1,0 +1,11 @@
+<resources>
+    <color name="chat_background">#141E1A</color>
+    <color name="chat_surface">#1E2B25</color>
+    <color name="chat_primary">#AED5BE</color>
+    <color name="chat_on_primary">#163B2B</color>
+    <color name="chat_text">#E5EEE7</color>
+    <color name="chat_muted">#B0C2B6</color>
+    <color name="chat_soft">#2B3D32</color>
+    <color name="chat_border">#3F5246</color>
+    <color name="chat_error">#FFB4A9</color>
+</resources>

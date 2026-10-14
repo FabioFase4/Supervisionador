@@ -89,6 +89,8 @@
         <activity android:name=".cadastro.CadastroOpcoesActivity" android:exported="false" />
         <activity android:name=".filho.home.HomeFilhoActivity" android:exported="false" />
         <activity android:name=".pai.home.HomePaiActivity" android:exported="false" />
+        <activity android:name=".vinculo.VinculoActivity" android:exported="false" />
+        <activity android:name=".chat.ChatActivity" android:exported="false" android:theme="@style/Theme.Chatbox" android:windowSoftInputMode="adjustResize" />
         <activity android:name=".pai.ListaFilhosActivity" android:exported="false" />
         <activity android:name=".cadastro.CadastroPaiActivity" android:exported="false" />
         <activity android:name=".cadastro.CadastroFilhoActivity" android:exported="false" />
